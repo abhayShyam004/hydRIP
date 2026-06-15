@@ -1,7 +1,11 @@
 import { io } from 'socket.io-client'
 
-const API_URL = 'http://localhost:3001/api'
-const socket = io('http://localhost:3001')
+const IS_DEV = import.meta.env.DEV
+const BASE_URL = IS_DEV ? 'http://localhost:3001' : ''
+const API_URL = `${BASE_URL}/api`
+
+// Pass empty string/undefined to let Socket.io infer the host in production
+const socket = io(IS_DEV ? 'http://localhost:3001' : undefined)
 
 class SupabaseMock {
   from(table) {

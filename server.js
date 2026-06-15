@@ -4,6 +4,11 @@ import Database from 'better-sqlite3'
 import { Server } from 'socket.io'
 import http from 'http'
 import crypto from 'crypto'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const app = express()
 const server = http.createServer(app)
@@ -17,8 +22,13 @@ const io = new Server(server, {
 app.use(cors())
 app.use(express.json())
 
+// Serve static frontend files in production
+app.use(express.static(path.join(__dirname, 'dist')))
+
 // Initialize SQLite Database
-const db = new Database('trip.sqlite')
+// On Render, we will mount a disk to /data to persist this
+const dbPath = process.env.DATABASE_PATH || 'trip.sqlite'
+const db = new Database(dbPath)
 
 // Initialize Schema
 db.exec(`
@@ -302,7 +312,12 @@ tables.forEach(table => {
   })
 })
 
-const PORT = 3001
-server.listen(PORT, () => {
-  console.log(`Backend server running on http://localhost:${PORT}`)
+// Catch-all route to serve the React app for any other requests
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'))
+})
+
+const PORT = process.env.PORT || 3001
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Backend server running on port ${PORT}`)
 })
