@@ -6,6 +6,7 @@ import http from 'http'
 import crypto from 'crypto'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import fs from 'fs'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -28,6 +29,13 @@ app.use(express.static(path.join(__dirname, 'dist')))
 // Initialize SQLite Database
 // On Render, we will mount a disk to /data to persist this
 const dbPath = process.env.DATABASE_PATH || 'trip.sqlite'
+
+// Ensure the directory exists before opening the database
+const dbDir = path.dirname(dbPath)
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true })
+}
+
 const db = new Database(dbPath)
 
 // Initialize Schema
