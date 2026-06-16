@@ -28,12 +28,17 @@ app.use(express.static(path.join(__dirname, 'dist')))
 
 // Initialize SQLite Database
 // On Render, use /tmp for temporary storage or set DATABASE_PATH env variable for persistent disk
-const dbPath = process.env.DATABASE_PATH || path.join(process.cwd(), 'trip.sqlite')
+let dbPath = process.env.DATABASE_PATH || path.join(process.cwd(), 'trip.sqlite')
 
 // Ensure the directory exists before opening the database
 const dbDir = path.dirname(dbPath)
-if (dbDir && !fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true })
+if (dbDir && dbDir !== '.' && !fs.existsSync(dbDir)) {
+  try {
+    fs.mkdirSync(dbDir, { recursive: true })
+  } catch (err) {
+    console.warn(`Failed to create directory ${dbDir}: ${err.message}. Falling back to local storage.`)
+    dbPath = path.join(process.cwd(), 'trip.sqlite')
+  }
 }
 
 const db = new Database(dbPath)
