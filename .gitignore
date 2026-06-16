@@ -30,9 +30,7 @@ dist-ssr
 .env.test.local
 .env.production.local
 
-# Database
-*.sqlite
-*.sqlite3
+
 
 # Local Gemini config
 .gemini/.local
