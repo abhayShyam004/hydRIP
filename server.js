@@ -27,12 +27,12 @@ app.use(express.json())
 app.use(express.static(path.join(__dirname, 'dist')))
 
 // Initialize SQLite Database
-// On Render, we will mount a disk to /data to persist this
-const dbPath = process.env.DATABASE_PATH || 'trip.sqlite'
+// On Render, use /tmp for temporary storage or set DATABASE_PATH env variable for persistent disk
+const dbPath = process.env.DATABASE_PATH || path.join(process.cwd(), 'trip.sqlite')
 
 // Ensure the directory exists before opening the database
 const dbDir = path.dirname(dbPath)
-if (!fs.existsSync(dbDir)) {
+if (dbDir && !fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true })
 }
 
