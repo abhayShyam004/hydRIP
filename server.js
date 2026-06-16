@@ -326,7 +326,7 @@ tables.forEach(table => {
 })
 
 // Catch-all route to serve the React app for any other requests
-app.get('*', (req, res) => {
+app.get('*path', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'))
 })
 
